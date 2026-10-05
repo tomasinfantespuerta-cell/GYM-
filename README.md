@@ -28,7 +28,7 @@ npm run build    # typecheck + build de producción
 - **Domingo:** actividad libre (fútbol, pádel, bici, caminar).
 - Semanas 1-2: readaptación (RIR 3). Después, doble progresión.
 
-## Hoja de ruta
+## Hoja de ruta (detalle en ROADMAP.md)
 - [x] **Fase 1:** semana, día, modo entreno (peso, reps y RIR), última vez, sugerencias, sustituir ejercicio, opcionales, cardio, actividad libre, temporizador de descanso, historial, perfil y peso corporal, copia manual
 - [ ] Copia automática en la nube (Supabase + login)
 - [ ] Gráficas de progreso por ejercicio, 1RM estimado y récords 🏆
