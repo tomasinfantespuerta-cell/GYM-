@@ -20,6 +20,22 @@ class GymDB extends Dexie {
       bodyweights: '++id, date',
       notes: '&exerciseId',
     })
+    // v2: descansos más cortos (principales 2:00, secundarios 1:30, pequeños 1:00)
+    this.version(2).upgrade((tx) =>
+      tx
+        .table('routines')
+        .toCollection()
+        .modify((r: Routine) => {
+          if (r.id !== SEED_ROUTINE.id) return
+          for (const day of r.days) {
+            const seedDay = SEED_ROUTINE.days.find((d) => d.id === day.id)
+            for (const it of day.items) {
+              const seedItem = seedDay?.items.find((x) => x.exerciseId === it.exerciseId)
+              if (seedItem) it.restSec = seedItem.restSec
+            }
+          }
+        }),
+    )
     this.on('populate', (tx) => {
       tx.table('routines').add(SEED_ROUTINE)
       tx.table('profile').add(SEED_PROFILE)
