@@ -38,31 +38,6 @@ function save(s: TimerState | null) {
   }
 }
 
-let audioCtx: AudioContext | null = null
-function unlockAudio() {
-  try {
-    audioCtx ??= new AudioContext()
-    if (audioCtx.state === 'suspended') audioCtx.resume()
-  } catch {
-    audioCtx = null
-  }
-}
-function beep() {
-  if (!audioCtx) return
-  const t = audioCtx.currentTime
-  for (const [i, f] of [880, 880, 1320].entries()) {
-    const o = audioCtx.createOscillator()
-    const g = audioCtx.createGain()
-    o.frequency.value = f
-    g.gain.setValueAtTime(0.0001, t + i * 0.22)
-    g.gain.exponentialRampToValueAtTime(0.3, t + i * 0.22 + 0.02)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.22 + 0.18)
-    o.connect(g).connect(audioCtx.destination)
-    o.start(t + i * 0.22)
-    o.stop(t + i * 0.22 + 0.2)
-  }
-}
-
 export function RestTimerProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<TimerState | null>(load)
 
@@ -74,7 +49,6 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
   const api: TimerApi = {
     state,
     start: (seconds, label) => {
-      unlockAudio()
       update({ endAt: Date.now() + seconds * 1000, total: seconds, label })
     },
     add: (seconds) => {
@@ -110,8 +84,8 @@ export function RestTimer() {
   useEffect(() => {
     if (!state || !finished || alerted.current === state.endAt) return
     alerted.current = state.endAt
-    navigator.vibrate?.([300, 150, 300, 150, 500])
-    beep()
+    // Solo vibración, sin sonido
+    navigator.vibrate?.([400, 150, 400, 150, 600])
   }, [finished, state])
 
   // Se cierra solo un rato después de terminar
