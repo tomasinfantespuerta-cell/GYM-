@@ -3,6 +3,7 @@
 App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `claude/nifty-wozniak-g6oag0` al hacer push).
 
 ## ✅ Hecho: Fase 1 (5-oct-2026)
+- 7-oct: descansos acortados (principales 2:00, secundarios 1:30, pequeños 1:00); el temporizador solo vibra, sin sonido
 - Semana con los días de la rutina, estado (hecho / hoy / pendiente) y actividad libre del domingo
 - Detalle de cada día con consejos de técnica y alternativas
 - Modo entreno con **autoguardado**: peso, reps, RIR opcional, última vez, sugerencia de progresión
@@ -20,6 +21,13 @@ App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `
 - Al iniciar sesión en otro móvil se recupera todo
 - Permite que un amigo tenga su cuenta con sus propios datos
 - **Lo que tendrá que hacer Tomás:** crear la cuenta en supabase.com y pasar la URL y la clave pública (guiado paso a paso)
+
+### 1b. 📳 Aviso de fin de descanso en segundo plano (elegido por Tomás, hacer junto a la nube)
+- Al marcar una serie, la app pide a una función de Vercel que le envíe una **notificación push** cuando acabe el descanso
+- Vibra aunque el móvil esté bloqueado o en otra app (Android; iPhone con la app instalada, iOS 16.4+)
+- Si pulsa "Saltar" o empieza otro descanso, el aviso anterior se cancela (el service worker comprueba el id del temporizador actual)
+- Necesita: claves VAPID, permiso de notificaciones y un envío con retraso (función que espera o cola tipo QStash)
+- Preguntar a Tomás si su móvil es Android o iPhone
 
 ### 2. 📈 Progreso y récords
 - Gráfica por ejercicio: peso máximo, 1RM estimado y volumen
