@@ -142,10 +142,13 @@ export async function lastPerformance(
   exerciseId: string,
   variant: string | undefined,
   excludeSessionId: string,
+  /** Solo sesiones de esta fecha o anteriores (para analizar entrenos antiguos) */
+  before?: string,
 ): Promise<LastPerformance | null> {
   const sessions = await db.sessions.orderBy('date').reverse().toArray()
   for (const s of sessions) {
     if (s.id === excludeSessionId) continue
+    if (before && s.date > before) continue
     for (const e of s.entries) {
       if (e.exerciseId !== exerciseId) continue
       if (variant && e.variant && e.variant !== variant) continue
@@ -153,6 +156,20 @@ export async function lastPerformance(
       if (done.length === 0) continue
       return { date: s.date, variant: e.variant, sets: done.map(({ weight, reps, rir }) => ({ weight, reps, rir })) }
     }
+  }
+  return null
+}
+
+/** Consejo que dejó el coach para este ejercicio en el último entreno analizado. */
+export async function lastCoachTip(
+  exerciseId: string,
+  excludeSessionId: string,
+): Promise<{ date: string; tip: string; weight?: number } | null> {
+  const sessions = await db.sessions.orderBy('date').reverse().toArray()
+  for (const s of sessions) {
+    if (s.id === excludeSessionId || !s.review) continue
+    const r = s.review.exercises.find((x) => x.exerciseId === exerciseId)
+    if (r) return r.nextTip ? { date: s.date, tip: r.nextTip, weight: r.nextWeight } : null
   }
   return null
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ExerciseCard from '../components/ExerciseCard'
 import { useRestTimer } from '../components/RestTimer'
+import { buildReview } from '../data/coach'
 import { db, fromISODate } from '../data/db'
 import { exerciseName } from '../data/exercises'
 import type { CardioLog, EntryLog, Session } from '../data/types'
@@ -16,7 +17,6 @@ export default function WorkoutPage() {
   const timer = useRestTimer()
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [showOptional, setShowOptional] = useState<Record<string, boolean>>({})
-  const [toast, setToast] = useState<string | null>(null)
   const [, tick] = useState(0)
 
   // Se carga una vez: a partir de ahí la pantalla manda y cada cambio se guarda al instante.
@@ -66,14 +66,13 @@ export default function WorkoutPage() {
   const date = fromISODate(session.date)
 
   async function finish() {
-    const volume = session!.entries.reduce(
-      (a, e) => a + e.sets.filter((s) => s.done).reduce((b, s) => b + (s.weight ?? 0) * (s.reps ?? 0), 0),
-      0,
-    )
-    update((s) => ({ ...s, finishedAt: s.finishedAt ?? new Date().toISOString() }))
     timer.stop()
-    setToast(`¡Entreno terminado! ${doneSets + extraDone} series · ${Math.round(volume).toLocaleString('es-ES')} kg movidos 💪`)
-    setTimeout(() => navigate('/'), 2200)
+    const finished: Session = { ...session!, finishedAt: session!.finishedAt ?? new Date().toISOString() }
+    const review = await buildReview(finished, day!)
+    const next = { ...finished, review }
+    setSession(next)
+    await db.sessions.put(next)
+    navigate(`/resumen/${next.id}`, { replace: true })
   }
 
   async function remove() {
@@ -85,7 +84,6 @@ export default function WorkoutPage() {
 
   return (
     <>
-      {toast && <div className="toast">{toast}</div>}
       <header className="topbar">
         <button className="back" onClick={() => navigate('/')} aria-label="Volver">
           ‹
@@ -104,6 +102,11 @@ export default function WorkoutPage() {
       <div className="progress" style={{ marginTop: -6, marginBottom: 6 }}>
         <div style={{ width: `${pct}%` }} />
       </div>
+      {session.review && (
+        <button className="option" style={{ marginBottom: 10 }} onClick={() => navigate(`/resumen/${session.id}`)}>
+          🧠 <b>Ver el análisis del coach</b> <span className="muted small">· nota {session.review.score}/10</span>
+        </button>
+      )}
       <div className="small muted" style={{ margin: '0 2px 8px' }}>
         💾 Todo se guarda solo al escribir. Puedes salir y volver cuando quieras.
       </div>
@@ -202,7 +205,7 @@ export default function WorkoutPage() {
       />
 
       <button className="btn primary block lg" style={{ marginTop: 20 }} onClick={finish} disabled={doneSets + extraDone === 0 && !session.cardio?.done}>
-        {session.finishedAt ? '✓ Guardar y volver' : '🏁 Terminar entreno'}
+        {session.finishedAt ? '✓ Guardar y ver análisis' : '🏁 Terminar y ver análisis'}
       </button>
       <button className="btn ghost danger block" style={{ marginTop: 10 }} onClick={remove}>
         Borrar este entreno

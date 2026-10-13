@@ -3,6 +3,7 @@
 App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `claude/nifty-wozniak-g6oag0` al hacer push).
 
 ## ✅ Hecho: Fase 1 (5-oct-2026)
+- 13-oct: **análisis del coach** al terminar el entreno (nota /10, lo bueno, a mejorar, ejercicio a ejercicio) y el consejo "para la próxima" aparece en cada ejercicio del siguiente entreno, con el peso propuesto
 - 7-oct: descansos acortados (principales 2:00, secundarios 1:30, pequeños 1:00); el temporizador solo vibra, sin sonido
 - Semana con los días de la rutina, estado (hecho / hoy / pendiente) y actividad libre del domingo
 - Detalle de cada día con consejos de técnica y alternativas
@@ -53,6 +54,7 @@ App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `
 - Registro de distancia, tiempo y ritmo; objetivo: 5 km sintiéndose ligero
 
 ## 💡 Mejoras e ideas
+- Análisis del coach con IA real (Claude vía función de Vercel) para comentarios más personalizados; ahora son reglas dentro de la app
 - Editor de rutina dentro de la app (añadir, quitar o cambiar ejercicios, series y descansos)
 - Varias rutinas guardadas y cambiar entre ellas sin perder el historial
 - Reordenar ejercicios en el modo entreno (arrastrar)

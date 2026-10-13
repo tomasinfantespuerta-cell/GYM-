@@ -64,7 +64,13 @@ export default function HistoryPage() {
                   {s.cardio?.done ? ` · ${s.cardio.minutes ?? ''}′ cardio` : ''}
                 </div>
               </div>
-              {s.finishedAt ? <span className="badge accent">✓</span> : <span className="badge warn">A medias</span>}
+              {s.review ? (
+                <span className="badge accent">{s.review.score}/10</span>
+              ) : s.finishedAt ? (
+                <span className="badge accent">✓</span>
+              ) : (
+                <span className="badge warn">A medias</span>
+              )}
             </div>
           </Link>
         )

@@ -79,6 +79,31 @@ export interface Session {
   entries: EntryLog[]
   cardio?: CardioLog
   notes?: string
+  /** Análisis del coach, se genera al terminar el entreno */
+  review?: Review
+}
+
+export type Verdict = 'up' | 'ok' | 'down' | 'skipped' | 'first'
+
+export interface ExerciseReview {
+  exerciseId: string
+  verdict: Verdict
+  /** Qué ha pasado hoy */
+  summary: string
+  /** Consejo para la próxima vez: se muestra en ese ejercicio en el siguiente entreno */
+  nextTip?: string
+  /** Peso que propone el coach para la próxima vez */
+  nextWeight?: number
+}
+
+export interface Review {
+  createdAt: string
+  /** Nota de 1 a 10 */
+  score: number
+  headline: string
+  good: string[]
+  improve: string[]
+  exercises: ExerciseReview[]
 }
 
 export interface Activity {

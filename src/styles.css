@@ -603,3 +603,65 @@ button.card {
   color: inherit;
   font: inherit;
 }
+
+/* ── Coach */
+.coach {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(182, 255, 46, 0.35);
+  font-size: 14px;
+  color: #e3ffb8;
+}
+.coach b {
+  color: var(--accent);
+}
+.score {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.score > div {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  line-height: 1;
+}
+.score b {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.score span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.review-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 15px;
+}
+.review-list li + li {
+  margin-top: 8px;
+}
+.review-list li::marker {
+  color: var(--accent);
+}
+.review-list.improve li::marker {
+  color: var(--warn);
+}
+.badge.danger {
+  background: rgba(255, 92, 122, 0.14);
+  color: var(--danger);
+}
+a.btn {
+  display: flex;
+}

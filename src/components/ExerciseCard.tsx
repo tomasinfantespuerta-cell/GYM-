@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useRef, useState } from 'react'
-import { db, lastPerformance } from '../data/db'
+import { db, lastCoachTip, lastPerformance } from '../data/db'
 import { EXERCISE_BY_ID, EXERCISES } from '../data/exercises'
 import { fmtKg, fmtRest, suggest } from '../data/progression'
 import type { EntryLog, RoutineItem, SetLog } from '../data/types'
@@ -33,6 +33,7 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
     [entry.exerciseId, entry.variant, sessionId],
   )
   const note = useLiveQuery(() => db.notes.get(entry.exerciseId), [entry.exerciseId])
+  const coachTip = useLiveQuery(() => lastCoachTip(entry.exerciseId, sessionId), [entry.exerciseId, sessionId])
 
   const sug = last === undefined ? null : suggest(item, last, date, ex?.bodyweight)
   const doneCount = entry.sets.filter((s) => s.done).length
@@ -50,6 +51,7 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
   function placeholderWeight(i: number): number | null {
     const prev = prevToday(i, 'weight')
     if (prev != null) return prev
+    if (coachTip?.weight != null) return coachTip.weight
     if (sug?.weight != null) return sug.weight
     return last?.sets[i]?.weight ?? last?.sets.at(-1)?.weight ?? null
   }
@@ -131,7 +133,12 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
           <span className="muted">Primera vez con este ejercicio{entry.variant ? ` en ${entry.variant}` : ''}.</span>
         )}
       </div>
-      {sug && <div className={`hint ${sug.kind === 'up' ? 'up' : ''}`}>{sug.text}</div>}
+      {coachTip && (
+        <div className="coach">
+          <b>🧠 Tu coach te dijo:</b> {coachTip.tip}
+        </div>
+      )}
+      {sug && !coachTip && <div className={`hint ${sug.kind === 'up' ? 'up' : ''}`}>{sug.text}</div>}
 
       <div className="sets">
         <div className="set-head">

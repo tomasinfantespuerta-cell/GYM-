@@ -3,6 +3,7 @@ import { RestTimer, RestTimerProvider } from './components/RestTimer'
 import DayPage from './pages/DayPage'
 import HistoryPage from './pages/HistoryPage'
 import ProfilePage from './pages/ProfilePage'
+import ReviewPage from './pages/ReviewPage'
 import WeekPage from './pages/WeekPage'
 import WorkoutPage from './pages/WorkoutPage'
 
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/" element={<WeekPage />} />
           <Route path="/dia/:dayId" element={<DayPage />} />
           <Route path="/entreno/:sessionId" element={<WorkoutPage />} />
+          <Route path="/resumen/:sessionId" element={<ReviewPage />} />
           <Route path="/historial" element={<HistoryPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
           <Route path="*" element={<WeekPage />} />
