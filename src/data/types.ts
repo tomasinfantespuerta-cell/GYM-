@@ -12,6 +12,8 @@ export interface RoutineItem {
   variant?: string
   /** Texto libre para casos especiales, p. ej. "por pierna" */
   note?: string
+  /** Ejercicios con el mismo valor se hacen en superserie (seguidos, sin descanso entre ellos) */
+  superset?: string
 }
 
 export interface CardioPlan {
@@ -21,7 +23,8 @@ export interface CardioPlan {
 
 export interface RoutineDay {
   id: string
-  weekday: Weekday
+  /** Día fijo de la semana (rutinas fijas). En rutinas flexibles no se usa. */
+  weekday?: Weekday
   name: string
   focus: string
   items: RoutineItem[]
@@ -37,6 +40,10 @@ export interface Routine {
   days: RoutineDay[]
   /** Día de actividad libre (fútbol, pádel, bici…) */
   activityWeekday?: Weekday
+  /** Rutina sin días fijos: los días se hacen en orden cuando se pueda */
+  flexible?: boolean
+  /** Entrenos objetivo por semana */
+  weeklyTarget?: number
 }
 
 export interface SetLog {

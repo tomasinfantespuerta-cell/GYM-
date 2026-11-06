@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import { SEED_PROFILE, SEED_ROUTINE, SEED_WEIGHT } from './seed'
+import { LEGACY_ROUTINE_3D, OLD_PROFILE_NOTES, PROFILE_NOTES, SEED_PROFILE, SEED_ROUTINE, SEED_WEIGHT } from './seed'
 import type { Activity, BodyWeight, EntryLog, ExerciseNote, Profile, Routine, RoutineDay, Session } from './types'
 
 class GymDB extends Dexie {
@@ -26,9 +26,9 @@ class GymDB extends Dexie {
         .table('routines')
         .toCollection()
         .modify((r: Routine) => {
-          if (r.id !== SEED_ROUTINE.id) return
+          if (r.id !== LEGACY_ROUTINE_3D.id) return
           for (const day of r.days) {
-            const seedDay = SEED_ROUTINE.days.find((d) => d.id === day.id)
+            const seedDay = LEGACY_ROUTINE_3D.days.find((d) => d.id === day.id)
             for (const it of day.items) {
               const seedItem = seedDay?.items.find((x) => x.exerciseId === it.exerciseId)
               if (seedItem) it.restSec = seedItem.restSec
@@ -36,6 +36,16 @@ class GymDB extends Dexie {
           }
         }),
     )
+    // v3: rutina nueva de 4 días flexibles; la anterior queda guardada (inactiva) para el historial
+    this.version(3).upgrade(async (tx) => {
+      const routines = tx.table('routines')
+      await routines.toCollection().modify({ active: 0 })
+      if (!(await routines.get(SEED_ROUTINE.id))) await routines.add(SEED_ROUTINE)
+      else await routines.update(SEED_ROUTINE.id, { active: 1 })
+      const profile = tx.table('profile')
+      const me = await profile.get('me')
+      if (me && me.notes === OLD_PROFILE_NOTES) await profile.update('me', { notes: PROFILE_NOTES })
+    })
     this.on('populate', (tx) => {
       tx.table('routines').add(SEED_ROUTINE)
       tx.table('profile').add(SEED_PROFILE)

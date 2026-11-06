@@ -14,6 +14,8 @@ interface Props {
   sessionId: string
   date: string
   onChange: (entry: EntryLog) => void
+  /** Nombre del otro ejercicio de la superserie, si la hay */
+  supersetWith?: string
 }
 
 function parseNum(raw: string): number | null {
@@ -21,7 +23,7 @@ function parseNum(raw: string): number | null {
   return Number.isFinite(n) ? n : null
 }
 
-export default function ExerciseCard({ entry, item, sessionId, date, onChange }: Props) {
+export default function ExerciseCard({ entry, item, sessionId, date, onChange, supersetWith }: Props) {
   const ex = EXERCISE_BY_ID[entry.exerciseId]
   const timer = useRestTimer()
   const [showTips, setShowTips] = useState(false)
@@ -35,7 +37,7 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
   const note = useLiveQuery(() => db.notes.get(entry.exerciseId), [entry.exerciseId])
   const coachTip = useLiveQuery(() => lastCoachTip(entry.exerciseId, sessionId), [entry.exerciseId, sessionId])
 
-  const sug = last === undefined ? null : suggest(item, last, date, ex?.bodyweight)
+  const sug = last === undefined ? null : suggest(item, last, date, ex?.bodyweight, entry.variant)
   const doneCount = entry.sets.filter((s) => s.done).length
   const complete = doneCount >= entry.sets.length && entry.sets.length > 0
 
@@ -73,7 +75,18 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
     }
     setAt(i, { done: true, weight, reps })
     const n = entry.sets.filter((x) => x.done).length + 1
-    const label = n >= entry.sets.length ? `${ex?.name} completado · siguiente ejercicio` : `${ex?.name} · serie ${n + 1} de ${entry.sets.length}`
+    // Primer ejercicio de una superserie: sin descanso, se pasa directamente al otro
+    if (item.restSec <= 0) {
+      navigator.vibrate?.(80)
+      return
+    }
+    const label = supersetWith
+      ? n >= entry.sets.length
+        ? 'Superserie completada · siguiente ejercicio'
+        : `Superserie · ronda ${n + 1} de ${entry.sets.length}`
+      : n >= entry.sets.length
+        ? `${ex?.name} completado · siguiente ejercicio`
+        : `${ex?.name} · serie ${n + 1} de ${entry.sets.length}`
     timer.start(item.restSec, label)
   }
 
@@ -102,7 +115,7 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
             {ex?.name ?? entry.exerciseId}
           </h3>
           <div className="target">
-            {targetText(item)} · {fmtRest(item.restSec)}
+            {targetText(item)} · {item.restSec > 0 ? fmtRest(item.restSec) : 'sin descanso'}
             {original && <span> · en lugar de {original.name}</span>}
           </div>
         </div>
@@ -129,6 +142,8 @@ export default function ExerciseCard({ entry, item, sessionId, date, onChange }:
               {last.sets.map((s) => `${s.weight != null ? fmtKg(s.weight) + '×' : ''}${s.reps ?? '–'}`).join(' · ')}
             </span>
           </>
+        ) : last === undefined ? (
+          <span className="muted">Cargando la última vez…</span>
         ) : (
           <span className="muted">Primera vez con este ejercicio{entry.variant ? ` en ${entry.variant}` : ''}.</span>
         )}

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { EXERCISE_BY_ID } from '../data/exercises'
 import { getActiveRoutine, startOrResumeSession, weekdayOf } from '../data/db'
-import { fmtRest } from '../data/progression'
+import { fmtRest, groupSupersets } from '../data/progression'
 import type { RoutineItem } from '../data/types'
 import { WD_NAME } from './WeekPage'
 
@@ -25,7 +25,8 @@ export default function DayPage() {
 
   const main = day.items.filter((x) => !x.optional)
   const extra = day.items.filter((x) => x.optional)
-  const isToday = weekdayOf(new Date()) === day.weekday
+  const isToday = routine.flexible || weekdayOf(new Date()) === day.weekday
+  const dayLabel = routine.flexible ? `Día ${routine.days.indexOf(day) + 1}` : WD_NAME[(day.weekday ?? 1) - 1]
   const totalSets = main.reduce((a, x) => a + x.sets, 0)
 
   async function start() {
@@ -42,7 +43,7 @@ export default function DayPage() {
           <div style={{ minWidth: 0 }}>
             <h3>{ex?.name ?? it.exerciseId}</h3>
             <div className="target">
-              {targetText(it)} · descanso {fmtRest(it.restSec)}
+              {targetText(it)} · {it.restSec > 0 ? `descanso ${fmtRest(it.restSec)}` : 'sin descanso, pasa al siguiente'}
             </div>
           </div>
           {it.variant && <span className="badge">{it.variant}</span>}
@@ -74,7 +75,7 @@ export default function DayPage() {
         <div>
           <h1>{day.name}</h1>
           <div className="sub">
-            {WD_NAME[day.weekday - 1]} · {day.focus}
+            {dayLabel} · {day.focus}
           </div>
         </div>
       </header>
@@ -90,7 +91,18 @@ export default function DayPage() {
       </button>
 
       <div className="section-title">Ejercicios · toca para ver consejos</div>
-      {main.map((it) => renderItem(it, day.items.indexOf(it)))}
+      {groupSupersets(main, (it) => it.superset).map((g) =>
+        g.items.length > 1 ? (
+          <div key={`ss-${day.items.indexOf(g.items[0])}`} className="superset">
+            <div className="superset-head">
+              🔗 <b>Superserie</b> · una serie de cada uno seguidas, luego descanso
+            </div>
+            {g.items.map((it) => renderItem(it, day.items.indexOf(it)))}
+          </div>
+        ) : (
+          renderItem(g.items[0], day.items.indexOf(g.items[0]))
+        ),
+      )}
 
       {day.cardio && (
         <div className="card" style={{ marginTop: 10 }}>

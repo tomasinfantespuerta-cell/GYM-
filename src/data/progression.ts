@@ -13,6 +13,13 @@ export function isReadaptation(dateISO: string): boolean {
   return programWeek(dateISO) <= 2
 }
 
+/** Cuánto se sube de peso de una vez según el material. */
+export function weightStep(exerciseId: string, variant?: string): number {
+  if (/mancuerna/i.test(variant ?? '')) return 2
+  if (exerciseId === 'prensa') return 5
+  return 2.5
+}
+
 export interface Suggestion {
   text: string
   /** Peso sugerido para precargar (si aplica) */
@@ -24,7 +31,13 @@ export interface Suggestion {
  * Doble progresión: si todas las series llegaron al máximo del rango, sube peso.
  * Si no, mismo peso e intenta sumar repeticiones.
  */
-export function suggest(item: RoutineItem, last: LastPerformance | null, dateISO: string, bodyweight = false): Suggestion {
+export function suggest(
+  item: RoutineItem,
+  last: LastPerformance | null,
+  dateISO: string,
+  bodyweight = false,
+  variant = item.variant,
+): Suggestion {
   const range = `${item.repMin}-${item.repMax}`
   if (isReadaptation(dateISO)) {
     if (!last) return { kind: 'easy', text: `Readaptación: elige un peso con el que hagas ${range} reps dejando unas 3 en reserva.` }
@@ -41,8 +54,7 @@ export function suggest(item: RoutineItem, last: LastPerformance | null, dateISO
       : { kind: 'keep', text: 'Intenta sumar 1 repetición en alguna serie.' }
   }
   if (allTop) {
-    const inc = item.restSec >= 120 ? 2.5 : 1
-    const next = round(w + inc)
+    const next = round(w + weightStep(item.exerciseId, variant ?? last.variant))
     return { kind: 'up', weight: next, text: `¡Completaste ${range} en todas! Sube a ${fmtKg(next)} kg.` }
   }
   return { kind: 'keep', weight: w, text: `Mantén ${fmtKg(w)} kg e intenta sumar repeticiones hasta llegar a ${item.repMax}.` }
@@ -71,4 +83,16 @@ export function fmtRest(sec: number): string {
 /** 1RM estimado (Epley) */
 export function e1rm(weight: number, reps: number): number {
   return reps <= 1 ? weight : weight * (1 + reps / 30)
+}
+
+/** Agrupa elementos seguidos que comparten superserie. */
+export function groupSupersets<T>(list: T[], key: (x: T) => string | undefined): { superset?: string; items: T[] }[] {
+  const out: { superset?: string; items: T[] }[] = []
+  for (const x of list) {
+    const k = key(x)
+    const last = out[out.length - 1]
+    if (k && last?.superset === k) last.items.push(x)
+    else out.push({ superset: k, items: [x] })
+  }
+  return out
 }

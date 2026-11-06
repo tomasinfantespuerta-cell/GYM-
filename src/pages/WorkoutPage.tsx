@@ -6,6 +6,7 @@ import { useRestTimer } from '../components/RestTimer'
 import { buildReview } from '../data/coach'
 import { db, fromISODate } from '../data/db'
 import { exerciseName } from '../data/exercises'
+import { groupSupersets } from '../data/progression'
 import type { CardioLog, EntryLog, Session } from '../data/types'
 import { WD_NAME } from './WeekPage'
 
@@ -112,9 +113,29 @@ export default function WorkoutPage() {
       </div>
 
       <div className="section-title">Ejercicios · en el orden que quieras</div>
-      {main.map((e) => (
-        <ExerciseCard key={e.key} entry={e} item={day.items[e.itemIndex]} sessionId={session.id} date={session.date} onChange={updateEntry} />
-      ))}
+      {groupSupersets(main, (e) => day.items[e.itemIndex]?.superset).map((g) => {
+        const cards = g.items.map((e) => (
+          <ExerciseCard
+            key={e.key}
+            entry={e}
+            item={day.items[e.itemIndex]}
+            sessionId={session.id}
+            date={session.date}
+            onChange={updateEntry}
+            supersetWith={g.items.length > 1 ? g.items.filter((o) => o !== e).map((o) => exerciseName(o.exerciseId)).join(', ') : undefined}
+          />
+        ))
+        return g.items.length > 1 ? (
+          <div key={g.items[0].key} className="superset">
+            <div className="superset-head">
+              🔗 <b>Superserie</b> · haz una serie de cada uno seguidas y descansa al terminar las dos
+            </div>
+            {cards}
+          </div>
+        ) : (
+          cards
+        )
+      })}
 
       {session.cardio && (
         <>

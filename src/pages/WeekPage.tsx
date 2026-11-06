@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ActivitySheet from '../components/ActivitySheet'
+import FlexWeek from './FlexWeek'
 import { addDays, db, getActiveRoutine, sessionHasProgress, startOfWeek, startOrResumeSession, toISODate, todayISO, weekdayOf } from '../data/db'
 import { isReadaptation, programWeek } from '../data/progression'
 import type { Activity, RoutineDay, Session } from '../data/types'
@@ -25,6 +26,7 @@ export default function WeekPage() {
   const activities = useLiveQuery(() => db.activities.where('date').between(from, to, true, true).toArray(), [from, to]) ?? []
 
   if (!routine) return null
+  if (routine.flexible) return <FlexWeek routine={routine} />
 
   const dayFor = (wd: number) => routine.days.find((d) => d.weekday === wd)
   const sessionFor = (day: RoutineDay): Session | undefined =>

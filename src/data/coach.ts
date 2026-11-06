@@ -1,6 +1,6 @@
 import { lastPerformance, type LastPerformance } from './db'
 import { EXERCISE_BY_ID } from './exercises'
-import { e1rm, fmtKg, fmtRest, isReadaptation, programWeek } from './progression'
+import { e1rm, fmtKg, fmtRest, isReadaptation, programWeek, weightStep } from './progression'
 import type { EntryLog, ExerciseReview, Review, RoutineDay, RoutineItem, Session, SetLog, Verdict } from './types'
 
 type DoneSet = SetLog & { reps: number }
@@ -44,7 +44,7 @@ function analyzeExercise(entry: EntryLog, item: RoutineItem, last: LastPerforman
         verdict: 'skipped',
         summary: 'No lo hiciste.',
         nextTip:
-          item.restSec >= 120
+          entry.itemIndex < 2
             ? 'La última vez te lo saltaste y es de los más importantes del día: hazlo de los primeros.'
             : 'La última vez te lo saltaste: si vas justo de tiempo, haz al menos 2 series.',
       },
@@ -55,7 +55,7 @@ function analyzeExercise(entry: EntryLog, item: RoutineItem, last: LastPerforman
   const bodyweight = ex?.bodyweight || done.every((s) => !s.weight)
   const w = Math.max(...done.map((s) => s.weight ?? 0))
   // Mancuernas van de 2 en 2 kg; barra/Multipower de 2,5; máquinas y poleas de 1
-  const step = /mancuerna/i.test(entry.variant ?? '') || /mancuerna/i.test(name) ? 2 : item.restSec >= 120 ? 2.5 : 1
+  const step = weightStep(entry.exerciseId, entry.variant ?? (/mancuerna/i.test(name) ? 'Mancuernas' : undefined))
   const up = roundTo(w + step, step)
   const down = Math.max(0, roundTo(w * 0.93, step))
   const reps = done.map((s) => s.reps)
@@ -97,7 +97,7 @@ function analyzeExercise(entry: EntryLog, item: RoutineItem, last: LastPerforman
   let nextWeight: number | undefined = bodyweight ? undefined : w
   if (belowIdx >= 0 && !bodyweight) {
     nextTip = onlyLastBelow
-      ? `En la última serie te quedaste en ${reps[reps.length - 1]} (el mínimo es ${item.repMin}). Mantén ${fmtKg(w)} kg y descansa el tiempo completo (${fmtRest(item.restSec)}).`
+      ? `En la última serie te quedaste en ${reps[reps.length - 1]} (el mínimo es ${item.repMin}). Mantén ${fmtKg(w)} kg y descansa el tiempo completo (${fmtRest(item.restSec || 75)}).`
       : `Te quedaste por debajo de ${item.repMin} ${unit}: el peso está algo alto. Prueba con ${fmtKg(down)} kg y completa el rango ${item.repMin}-${item.repMax}.`
     if (!onlyLastBelow) nextWeight = down
   } else if (allTop && readapt && avgRir != null && avgRir <= 1) {
@@ -113,7 +113,7 @@ function analyzeExercise(entry: EntryLog, item: RoutineItem, last: LastPerforman
     nextWeight = up
     nextTip = `Te sobraban muchas reps (3 o más). Sube a ${fmtKg(up)} kg o haz más reps, hasta ${item.repMax}.`
   } else if (dropOff) {
-    nextTip = `Perdiste muchas reps entre series (${reps[0]} → ${reps[reps.length - 1]}). Descansa el tiempo completo (${fmtRest(item.restSec)}) o baja un poco el peso.`
+    nextTip = `Perdiste muchas reps entre series (${reps[0]} → ${reps[reps.length - 1]}). Descansa el tiempo completo (${fmtRest(item.restSec || 75)}) o baja un poco el peso.`
   } else if (!complete) {
     nextTip = `Hiciste ${done.length} de ${item.sets} series: intenta completarlas todas.`
   } else {

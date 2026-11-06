@@ -3,6 +3,7 @@
 App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `claude/nifty-wozniak-g6oag0` al hacer push).
 
 ## ✅ Hecho: Fase 1 (5-oct-2026)
+- 6-nov: **rutina nueva de 4 días flexibles** (la app propone el siguiente en orden, contador semanal), **superseries** (el cronómetro salta tras el 2.º ejercicio), ejercicios nuevos (mariposa, aductores, abductores, zancadas) y saltos de peso según el material (mancuernas 2 kg, prensa 5 kg, resto 2,5 kg)
 - 6-nov: temporizador de descanso a **pantalla completa** (círculo, −15/+15 s, saltar) y pantalla encendida durante el descanso
 - 13-oct: **análisis del coach** al terminar el entreno (nota /10, lo bueno, a mejorar, ejercicio a ejercicio) y el consejo "para la próxima" aparece en cada ejercicio del siguiente entreno, con el peso propuesto
 - 7-oct: descansos acortados (principales 2:00, secundarios 1:30, pequeños 1:00); el temporizador solo vibra, sin sonido
@@ -43,10 +44,10 @@ App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `
 - Resumen semanal: entrenos, series, volumen y minutos de cardio
 
 ### 4. 🧠 Propuestas del coach
-- Hacia **principios de diciembre de 2026** (unas 8 semanas): proponer cambios para que Tomás diga sí o no
-  - Recuperar las aperturas en polea (lunes)
+- ~~Pasar a 4 días~~ (hecho el 6-nov a petición de Tomás)
+- Hacia **principios de enero de 2027** (unas 8 semanas con la rutina nueva): proponer cambios para que Tomás diga sí o no
   - Rotar algún ejercicio para no estancarse ni aburrirse
-  - Pasar a 4 días con un día extra de **torso**
+  - Valorar meter sentadilla de vez en cuando (prefiere prensa)
 - Detectar estancamientos (3 semanas sin progresar en un ejercicio) y sugerir un cambio
 - Semana de descarga cada 6-8 semanas
 

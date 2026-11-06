@@ -8,6 +8,7 @@ export type Muscle =
   | 'Femoral'
   | 'Glúteo'
   | 'Gemelo'
+  | 'Aductor'
   | 'Abdomen'
 
 export interface ExerciseDef {
@@ -50,10 +51,10 @@ export const EXERCISES: ExerciseDef[] = [
     id: 'press-inclinado',
     name: 'Press inclinado',
     muscle: 'Pecho',
-    variants: ['Mancuernas', 'Multipower'],
+    variants: ['Multipower', 'Mancuernas'],
     tips: [
       'Banco a unos 30°: más inclinado ya trabaja sobre todo hombro.',
-      'Con mancuernas, fíjate si un lado va peor que el otro.',
+      'Con mancuernas, fíjate si un lado va peor que el otro; en Multipower, baja la barra a la parte alta del pecho.',
     ],
     alternatives: ['press-pecho-maquina', 'press-banca-mancuernas'],
   },
@@ -76,9 +77,12 @@ export const EXERCISES: ExerciseDef[] = [
   },
   {
     id: 'contractor-pecho',
-    name: 'Contractor de pecho (peck deck)',
+    name: 'Mariposa (contractor de pecho)',
     muscle: 'Pecho',
-    tips: ['Espalda pegada al respaldo.', 'No dejes que los brazos vayan demasiado atrás.'],
+    tips: [
+      'Espalda pegada al respaldo y asas a la altura del pecho.',
+      'Junta las manos delante y aprieta 1 segundo; no dejes que los brazos vayan demasiado atrás.',
+    ],
     alternatives: ['aperturas-polea'],
   },
 
@@ -274,6 +278,32 @@ export const EXERCISES: ExerciseDef[] = [
     variants: ['Barra', 'Máquina', 'Multipower'],
     tips: ['Barbilla al pecho, sube hasta que la cadera quede alineada con el tronco.'],
     alternatives: ['peso-muerto-rumano'],
+  },
+  {
+    id: 'aductores',
+    name: 'Aductores en máquina (cerrar)',
+    muscle: 'Aductor',
+    tips: ['Espalda apoyada, cierra las piernas controlando y aprieta 1 segundo.', 'Vuelve despacio, sin dejar que las placas choquen.'],
+    alternatives: ['abductores'],
+  },
+  {
+    id: 'abductores',
+    name: 'Abductores en máquina (abrir)',
+    muscle: 'Glúteo',
+    tips: ['Abre las piernas empujando con el lateral del glúteo.', 'Echarte un poco hacia delante lo trabaja aún más.', 'Protege las rodillas al correr.'],
+    alternatives: ['aductores'],
+  },
+  {
+    id: 'zancadas',
+    name: 'Zancadas caminando',
+    muscle: 'Cuádriceps',
+    variants: ['Mancuernas', 'Sin peso'],
+    tips: [
+      'Paso largo, baja hasta que la rodilla de atrás casi toque el suelo.',
+      'Tronco recto y rodilla de delante en la línea del pie.',
+      'Repeticiones por pierna. Sube mucho las pulsaciones: empieza sin peso o con poco.',
+    ],
+    alternatives: ['sentadilla-bulgara', 'prensa'],
   },
   {
     id: 'extension-cuadriceps',
