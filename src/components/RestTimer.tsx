@@ -53,7 +53,7 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
     },
     add: (seconds) => {
       if (!state) return
-      const endAt = Math.max(Date.now(), state.endAt) + seconds * 1000
+      const endAt = Math.max(Date.now() + 1000, Math.max(Date.now(), state.endAt) + seconds * 1000)
       update({ ...state, endAt, total: Math.max(state.total, Math.round((endAt - Date.now()) / 1000)) })
     },
     stop: () => update(null),
@@ -95,29 +95,59 @@ export function RestTimer() {
     return () => clearTimeout(id)
   }, [finished, stop])
 
+  // Mantiene la pantalla encendida durante el descanso para que el aviso llegue
+  useEffect(() => {
+    if (!state) return
+    let lock: WakeLockSentinel | null = null
+    let cancelled = false
+    navigator.wakeLock
+      ?.request('screen')
+      .then((l) => {
+        if (cancelled) l.release()
+        else lock = l
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+      lock?.release().catch(() => {})
+    }
+  }, [state])
+
   if (!state) return null
-  const pct = Math.max(0, Math.min(100, (left / state.total) * 100))
+  const frac = Math.max(0, Math.min(1, left / state.total))
+  const R = 120
+  const C = 2 * Math.PI * R
 
   return (
-    <div className={`timer ${finished ? 'finished' : ''}`} role="timer">
-      <div className="time">{finished ? '¡Ya!' : fmtRest(left)}</div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="small" style={{ fontWeight: 700 }}>
-          {finished ? 'A por la siguiente serie 💪' : 'Descanso'}
-        </div>
-        <div className="small" style={{ opacity: 0.75, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {state.label}
-        </div>
+    <div className={`timer-full ${finished ? 'finished' : ''}`} role="timer" aria-live="polite">
+      <div className="timer-label">{finished ? '¡Descanso terminado!' : 'Descanso'}</div>
+      <div className="timer-ring">
+        <svg viewBox="0 0 280 280" aria-hidden="true">
+          <circle cx="140" cy="140" r={R} className="track" />
+          {!finished && <circle cx="140" cy="140" r={R} className="fill" strokeDasharray={C} strokeDashoffset={C * (1 - frac)} />}
+        </svg>
+        <div className="timer-time">{finished ? '¡Ya!' : fmtRest(left)}</div>
       </div>
-      {!finished && (
-        <button className="btn sm" onClick={() => add(15)} aria-label="Añadir 15 segundos">
-          +15s
+      <div className="timer-next">{finished ? 'A por la siguiente serie 💪' : state.label}</div>
+      {finished ? (
+        <button className="btn primary lg timer-main" onClick={stop}>
+          Empezar la serie
         </button>
+      ) : (
+        <>
+          <div className="row" style={{ gap: 12 }}>
+            <button className="btn lg" onClick={() => add(-15)} aria-label="Quitar 15 segundos">
+              −15 s
+            </button>
+            <button className="btn lg" onClick={() => add(15)} aria-label="Añadir 15 segundos">
+              +15 s
+            </button>
+          </div>
+          <button className="btn ghost timer-skip" onClick={stop}>
+            Saltar descanso
+          </button>
+        </>
       )}
-      <button className={`btn sm ${finished ? '' : 'ghost'}`} onClick={stop} aria-label="Cerrar temporizador">
-        {finished ? 'OK' : 'Saltar'}
-      </button>
-      {!finished && <div className="bar" style={{ width: `${pct}%` }} />}
     </div>
   )
 }

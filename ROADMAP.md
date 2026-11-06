@@ -3,6 +3,7 @@
 App publicada en **https://gym-seven-plum.vercel.app** (Vercel publica la rama `claude/nifty-wozniak-g6oag0` al hacer push).
 
 ## ✅ Hecho: Fase 1 (5-oct-2026)
+- 6-nov: temporizador de descanso a **pantalla completa** (círculo, −15/+15 s, saltar) y pantalla encendida durante el descanso
 - 13-oct: **análisis del coach** al terminar el entreno (nota /10, lo bueno, a mejorar, ejercicio a ejercicio) y el consejo "para la próxima" aparece en cada ejercicio del siguiente entreno, con el peso propuesto
 - 7-oct: descansos acortados (principales 2:00, secundarios 1:30, pequeños 1:00); el temporizador solo vibra, sin sonido
 - Semana con los días de la rutina, estado (hecho / hoy / pendiente) y actividad libre del domingo

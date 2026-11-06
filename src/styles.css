@@ -665,3 +665,89 @@ button.card {
 a.btn {
   display: flex;
 }
+
+/* ── Temporizador a pantalla completa */
+.timer-full {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: radial-gradient(circle at 50% 40%, #13284f 0%, var(--bg) 70%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(var(--safe-bottom) + 24px);
+  text-align: center;
+}
+.timer-full.finished {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.timer-label {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.timer-full.finished .timer-label {
+  color: var(--accent-ink);
+}
+.timer-ring {
+  position: relative;
+  width: min(78vw, 320px);
+  aspect-ratio: 1;
+}
+.timer-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.timer-ring circle {
+  fill: none;
+  stroke-width: 14;
+}
+.timer-ring .track {
+  stroke: var(--surface-2);
+}
+.timer-ring .fill {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.25s linear;
+}
+.timer-full.finished .timer-ring .track,
+.timer-full.finished .timer-ring .fill {
+  stroke: rgba(10, 20, 40, 0.15);
+}
+.timer-time {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(56px, 20vw, 88px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+.timer-next {
+  font-size: 16px;
+  font-weight: 600;
+  max-width: 340px;
+  color: #c9d6f5;
+}
+.timer-full.finished .timer-next {
+  color: var(--accent-ink);
+}
+.timer-full .btn.lg {
+  min-width: 120px;
+}
+.timer-main {
+  width: min(100%, 340px);
+  background: var(--accent-ink) !important;
+  color: var(--accent) !important;
+  border-color: var(--accent-ink) !important;
+}
+.timer-skip {
+  color: var(--muted);
+}
